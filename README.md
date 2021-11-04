@@ -18,4 +18,4 @@ mencionada anteriormente, si así se requiere para poder llevar a cabo la resolu
 
 ### Desarrollo 🔧
 
-- [ResolverLaberintoImplementacion](https://github.com/381094-2021-2C-PROGRAMACION-III/TPO-PIII/master/src/ResolverLaberintoImplementacion.java)
+- [ResolverLaberintoImplementacion](https://github.com/381094-2021-2C-PROGRAMACION-III/TPO-PIII/blob/main/src/ResolverLaberintoImplementacion.java)
