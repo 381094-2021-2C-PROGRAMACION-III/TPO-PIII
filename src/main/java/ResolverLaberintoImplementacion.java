@@ -4,7 +4,7 @@ import java.util.logging.Logger;
 public class ResolverLaberintoImplementacion implements ResolverLaberintoInterface {
     private final static Logger LOGGER = Logger.getLogger("ResolverLaberintoImplementacion");
     public static final int VALOR_PROHIBIDO = -1;
-    public static final int VALOR_DE_NO_CAMINO = 10000000;
+    public static final int VALOR_DE_NO_CAMINO = Integer.MAX_VALUE;
 
     @Override
     public ArrayList<Posicion> resolverLaberinto(int[][] arg0, int arg1, int arg2, int arg3, int arg4) {
@@ -13,16 +13,10 @@ public class ResolverLaberintoImplementacion implements ResolverLaberintoInterfa
         Posicion nodoOrigen = tableroNodos[arg1][arg2];
         Posicion nodoDestino = tableroNodos[arg3][arg4];
 
-        ArrayList<Posicion> recorrido = new ArrayList<Posicion>();
+        ArrayList<Posicion> recorrido = new ArrayList<>();
 
-        ArrayList<Posicion> mejorCamino = new ArrayList<Posicion>();
-        Posicion nodo = new Posicion();
-        nodo.setValor(VALOR_DE_NO_CAMINO);
-        mejorCamino.add(nodo);
-        ArrayList<Posicion> recorrido2 = new ArrayList<Posicion>();
-
-        ArrayList<Posicion> visitados = new ArrayList<Posicion>();
-        Camino(tableroNodos, nodoOrigen, nodoDestino, recorrido, mejorCamino);
+        recorrido.add(nodoOrigen);
+        ArrayList<Posicion> mejorCamino = Camino(tableroNodos, nodoOrigen, nodoDestino, recorrido);
         mejorCamino.remove(nodoOrigen);
         mejorCamino.remove(nodoDestino);
         if (costoCamino(mejorCamino) == VALOR_DE_NO_CAMINO) {
@@ -32,13 +26,21 @@ public class ResolverLaberintoImplementacion implements ResolverLaberintoInterfa
 
     }
 
+    private ArrayList<Posicion> MaxMaxino() {
+        ArrayList<Posicion> mejorCamino = new ArrayList<>();
+        Posicion nodo = new Posicion();
+        nodo.setValor(VALOR_DE_NO_CAMINO);
+        mejorCamino.add(nodo);
+        return mejorCamino;
+    }
+
     //NUEVA MATRIZ CON NODOS
     private Posicion[][] InicializarNodos(int[][] tablero) {
         int row = tablero.length;
         int col = tablero[0].length;
         Posicion[][] tableroNodos = new Posicion[row][col];
 
-        int valor = 0;
+        int valor;
         for (int i = 0; i < row; i++) {
             for (int j = 0; j < col; j++) {
                 valor = tablero[i][j];
@@ -53,45 +55,38 @@ public class ResolverLaberintoImplementacion implements ResolverLaberintoInterfa
     }
 
 
-    private boolean Camino(Posicion[][] tableroNodos, Posicion nodoActual, Posicion nodoDestino, ArrayList<Posicion> recorrido, ArrayList<Posicion> mejorCamino) {
-        if (!recorrido.contains(nodoActual)) {
-            recorrido.add(nodoActual);
-        }
-/*
+    private ArrayList<Posicion> Camino(Posicion[][] tableroNodos, Posicion nodoActual, Posicion nodoDestino, ArrayList<Posicion> recorrido) {
         if (nodoActual == nodoDestino) {
-            return true;
+            return recorrido;
         }
-*/
-
-        if (nodoActual.x == nodoDestino.x && nodoActual.y == nodoDestino.y) {
-            return true;
-        }
-
+        /*if (costoCamino(recorrido) > costoCamino(mejorCamino)) {
+            return false;
+        }*/
         ArrayList<Posicion> adyacentes = Adyacentes(tableroNodos, nodoActual, recorrido);
-        boolean existeAdyacenteValido = false;
-        for (int i = 0; i < adyacentes.size(); i++) {
-            boolean isCaminoValido = Camino(tableroNodos, adyacentes.get(i), nodoDestino, recorrido, mejorCamino);
-            existeAdyacenteValido |= isCaminoValido;
-            if (isCaminoValido && costoCamino(recorrido) < costoCamino(mejorCamino)) {
+        ArrayList<Posicion> mejorCamino = MaxMaxino();
+        for (Posicion adyacenteActual : adyacentes) {
+            recorrido.add(adyacenteActual);
+            ArrayList<Posicion> camino = Camino(tableroNodos, adyacenteActual, nodoDestino, recorrido);
+            if (costoCamino(camino) < costoCamino(mejorCamino)) {
                 mejorCamino.clear();
-                mejorCamino.addAll(recorrido);
+                mejorCamino.addAll(camino);
             }
-            recorrido.remove(adyacentes.get(i));
+            recorrido.remove(adyacenteActual);
         }
-        return existeAdyacenteValido;
+        return mejorCamino;
     }
 
     private int costoCamino(ArrayList<Posicion> recorrido) {
         int costoCamino = 0;
-        for (int k = 0; k < recorrido.size(); k++) {
-            costoCamino += recorrido.get(k).getValor();
+        for (Posicion posicion : recorrido) {
+            costoCamino += posicion.getValor();
         }
         return costoCamino;
     }
 
     //OBTENCION DE NODOS ADYACENTES
     private ArrayList<Posicion> Adyacentes(Posicion[][] tableroNodos, Posicion nodo, ArrayList<Posicion> recorrido) {
-        ArrayList<Posicion> nodosAdyacentes = new ArrayList<Posicion>();
+        ArrayList<Posicion> nodosAdyacentes = new ArrayList<>();
         int x = nodo.getX();
         int y = nodo.getY();
         int row = tableroNodos.length - 1;
